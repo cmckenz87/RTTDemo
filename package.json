@@ -10,7 +10,8 @@
 		"nodemailer": "^6.9.9",
 		"pug": "^3.0.2",
 		"utf-8-validate": "^6.0.3",
-		"ws": "^8.16.0"
+		"ws": "^8.16.0",
+		"sqlite":"^4.1.1"
 	},
 	"scripts": {
     "setup-db": "sqlite3 db < schema.sql && sqlite3 db < public/arcs/title.sql"

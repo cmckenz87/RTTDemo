@@ -268,9 +268,9 @@ create view message_view as
 		users_to.name as to_name
 	from
 		messages
-		left join users as users_from
+		left join users users_from
 			on messages.from_id = users_from.user_id
-		left join users as users_to
+		left join users users_to
 			on messages.to_id = users_to.user_id
 	;
 
@@ -335,7 +335,7 @@ create view thread_view as
 		) as mtime
 	from
 		threads
-		left join users as author
+		left join users author
 			on threads.author_id = author.user_id
 	;
 
@@ -346,7 +346,7 @@ create view post_view as
 		author.name as author_name
 	from
 		posts
-		left join users as author
+		left join users author
 			on posts.author_id = author.user_id
 	;
 
@@ -470,7 +470,7 @@ create view game_view as
 	from
 		games
 		join titles using(title_id)
-		left join users as owner
+		left join users owner
 			on owner.user_id = games.owner_id
 	;
 

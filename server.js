@@ -17,7 +17,7 @@ const DEBUG = process.env.DEBUG || 0;
 const HTTP_HOST = process.env.HTTP_HOST || "0.0.0.0";
 const HTTP_PORT = process.env.HTTP_PORT || 8080;
 
-const SITE_NAME = process.env.SITE_NAME || "Localhost";
+const SITE_NAME = process.env.SITE_NAME || "Fatekeeper";
 const SITE_URL = process.env.SITE_URL || "http://" + HTTP_HOST + ":" + HTTP_PORT;
 
 const LIMIT_WAITING_GAMES = process.env.LIMIT_WAITING_GAMES | 0 || 3;

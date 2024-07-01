@@ -54,7 +54,7 @@ async function runAllSql() {
   // Specify your database file and SQL file path
   const dbPath = "./db";
   const sqlPath = "./schema.sql";
-  const sqlPath2 = "./public/test/title.sql";
+  const sqlPath2 = "./public/imperium/title.sql";
 
   // Run the SQL files in sequence
   await runSqlFromFile(dbPath, sqlPath);

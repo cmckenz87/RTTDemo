@@ -9,11 +9,8 @@
 		"express": "^4.18.2",
 		"nodemailer": "^6.9.9",
 		"pug": "^3.0.2",
+		"sqlite3": "^5.1.7",
 		"utf-8-validate": "^6.0.3",
-		"ws": "^8.16.0",
-		"sqlite":"^4.1.1"
-	},
-	"scripts": {
-    "setup-db": "sqlite3 db < schema.sql && sqlite3 db < public/arcs/title.sql"
-  }
+		"ws": "^8.16.0"
+	}
 }

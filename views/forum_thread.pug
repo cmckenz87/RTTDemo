@@ -1,0 +1,19 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		title= thread.subject
+	body
+		include header
+		article
+			h1= thread.subject
+
+			each row in posts
+				+forumpost(row,1)
+
+			if user
+				if posts.length > 0
+					p: a(href="/forum/reply/"+posts[0].post_id) Reply
+				if user.user_id === 1
+					p: a(href="/admin/delete-thread/"+thread.thread_id) DELETE THREAD

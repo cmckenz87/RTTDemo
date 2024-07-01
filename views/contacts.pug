@@ -1,0 +1,53 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		title Contacts
+		style.
+			td a.red { text-decoration: none; color: var(--color-red); font-size: 14px; margin-left: 8px; }
+			td a.blue { text-decoration: none; color: var(--color-black); font-size: 16px; margin-left: 8px; }
+			td a.blue:hover { color: var(--color-blue); }
+	body
+		include header
+		article
+
+			h1 Friends &amp; Enemies
+
+			table.half.striped
+				thead
+					tr
+						th Friends
+						th Last seen
+						th
+				tbody
+					each who in friends
+						tr
+							td
+								a.black(href="/user/"+who.name)= who.name
+							td.w= who.atime
+							td.w.r
+								a.blue(href="/message/send/"+who.name) &#x1f4dd;
+								a.red(href="/contacts/remove/"+who.name) &#x274c;
+					else
+						tr
+							td Nobody
+
+			if enemies.length > 0
+				p
+
+				table.half.striped
+					thead
+						tr
+							th Blacklist
+							th
+					tbody
+						each who in enemies
+							tr
+								td
+									a.black(href="/user/"+who.name)= who.name
+								td.r
+									a.red(href="/contacts/remove/"+who.name) &#x274c;
+						else
+							tr
+								td Nobody

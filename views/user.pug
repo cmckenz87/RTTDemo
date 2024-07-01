@@ -1,0 +1,61 @@
+//- vim:ts=4:sw=4:
+- let open_games = games.filter(game => game.status === 0)
+- let active_games = games.filter(game => game.status === 1)
+- let finished_games = games.filter(game => game.status === 2)
+doctype html
+html
+	head
+		include head
+		title= who.name
+		style.
+			.about {
+				white-space: pre-wrap;
+				font-style: italic;
+				padding: 8px 12px;
+				border: var(--thin-border);
+				box-shadow: var(--drop-shadow);
+				background-color: var(--color-text);
+			}
+	body
+		include header
+		article
+			h1= who.name
+
+			if who.about
+				p.about= who.about
+
+			p Member since #{who.ctime}.
+			p Last seen #{who.atime}.
+
+			if user && (who.user_id !== user.user_id)
+				p
+					a(href="/message/send/"+who.name) Send message
+					br
+					if relation > 0
+						a(href="/contacts/remove/"+who.name) Remove from friends
+					else if relation < 0
+						a(href="/contacts/remove/"+who.name) Remove from blacklist
+					else
+						a(href="/contacts/add-friend/"+who.name) Add to friends
+						br
+						a(href="/contacts/add-enemy/"+who.name) Blacklist user
+
+			if open_games.length > 0
+				h2 Open
+				+gamelist(open_games)
+
+			if active_games.length > 0
+				h2 Active
+				+gamelist(active_games)
+
+			if finished_games.length > 0
+				h2 Recently finished
+				+gamelist(finished_games)
+
+			p <a href="/games/finished/#{who.name}">All #{who.name}'s finished games</a>
+
+			if user && user.user_id === 1
+				if who.is_banned
+					p <a href="/admin/unban-user/#{who.name}">UNBAN USER</a>
+				else
+					p <a href="/admin/ban-user/#{who.name}">BAN USER</a>

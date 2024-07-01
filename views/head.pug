@@ -1,0 +1,135 @@
+//- vim:ts=4:sw=4:
+
+meta(name="viewport" content="width=device-width,initial-scale=1")
+meta(name="theme-color" content="#444")
+link(rel="icon" type="image/svg+xml" href="/favicon.svg")
+link(rel="stylesheet" href="/fonts/fonts.css")
+link(rel="stylesheet" href="/style.css")
+if SITE_THEME
+	link(rel="stylesheet" href="/themes/"+SITE_THEME)
+
+mixin social(title,description,game)
+	meta(property="og:title" content=title)
+	meta(property="og:type" content="website")
+	if game
+		meta(property="og:image" content=SITE_URL+"/"+game+"/cover.2x.jpg")
+	else
+		if SITE_ICON
+			meta(property="og:image" content=SITE_URL+"/images/"+SITE_ICON)
+		else
+			meta(property="og:image" content=SITE_URL+"/images/rally-the-troops.png")
+	meta(property="og:description" content=description)
+
+mixin gamecover(title_id)
+	a(href="/"+title_id)
+		img(src=`/${title_id}/cover.1x.jpg` srcset=`/${title_id}/cover.2x.jpg 2x`)
+
+mixin forumpost(row,show_buttons)
+	.post(id=row.post_id)
+		.head
+			.from: b: a.black(href="/user/"+row.author_name)= row.author_name
+			.time= row.ctime
+				if row.edited
+					|
+					| (edited #{row.mtime})
+		.body!= row.body
+	if show_buttons && user
+		.edit
+			if user.user_id === 1
+				| #[a(href="/admin/delete-post/"+row.post_id) DELETE]
+				|
+			if row.author_id === user.user_id
+				| #[a(href="/forum/edit/"+row.post_id) Edit]
+				|
+			| #[a(href="/forum/reply/"+row.post_id) Reply]
+
+mixin gamelist(list,hide_title=0)
+	div.game_list
+		each item in list
+			div
+				-
+					let className = "game_item"
+					let pace_icon = ""
+					let pace_text = ""
+					let chat_icon = ""
+					if (item.your_turn) className += " your_turn"
+					if (item.status === 0 && item.join_count === 0) className += " open replacement"
+					else if (item.status === 0 && item.join_count !== item.player_count) className += " open"
+					else if (item.status === 0 && item.join_count === item.player_count) className += " ready"
+					else if (item.status === 1 && item.join_count !== item.player_count) className += " replacement"
+					else if (item.status === 1 && item.join_count === item.player_count) className += " active"
+					else if (item.status === 2) className += " finished"
+					else if (item.status === 3) className += " archived"
+					if (item.is_unread) chat_icon = "\u{1f4dd}"
+					if (item.is_match) pace_icon = EMOJI_MATCH
+					else if (item.pace === 1) pace_icon = EMOJI_LIVE, pace_text = "Live!"
+					else if (item.pace === 2) pace_icon = EMOJI_FAST, pace_text = "Fast - many moves per day"
+					else if (item.pace === 3) pace_icon = EMOJI_SLOW, pace_text = "Slow - one move per day"
+
+				div(class=className)
+					div.game_head
+						if item.scenario.length <= 2
+							div
+								| #{pace_icon} <a href="/join/#{item.game_id}">##{item.game_id} &#x2013; #{item.title_name} (#{item.scenario})</a> #{chat_icon}
+						else
+							div
+								| #{pace_icon} <a href="/join/#{item.game_id}">##{item.game_id} &#x2013; #{item.title_name}</a> #{chat_icon}
+
+						case item.status
+							when 0
+								a(class="command" href=`/join/${item.game_id}`) Enter
+							when 1
+								if !item.is_ready
+									a(class="command" href="/join/"+item.game_id) Enter
+								else if item.is_yours
+									if item.your_role
+										a(class="command" href=`/${item.title_id}/play.html?game=${item.game_id}&role=${encodeURIComponent(item.your_role)}`) Play
+									else
+										a(class="command" href="/join/"+item.game_id) Enter
+								else
+									a(class="command" href=`/${item.title_id}/play.html?game=${item.game_id}&role=Observer`) View
+							when 2
+								if item.is_yours
+									if item.your_role
+										a(class="command" href=`/${item.title_id}/play.html?game=${item.game_id}&role=${encodeURIComponent(item.your_role)}`) Play
+									else
+										a(class="command" href="/join/"+item.game_id) Enter
+								else
+									a(class="command" href=`/${item.title_id}/play.html?game=${item.game_id}&role=Observer`) View
+							when 3
+								| Archived
+
+					div.game_main
+						div.game_info
+							if item.notice
+								i= item.notice
+							else
+								i= pace_text
+							if item.scenario !== "Standard" && item.scenario !== "Historical" && item.scenario.length > 2
+								div Scenario: #{item.scenario}
+							unless item.human_options === "None"
+								div Options: #{item.human_options}
+							if item.player_names
+								div Players: !{item.player_names}
+							else
+								div Players: <span class="error">Nobody</span>
+							case item.status
+								when 0
+									div Created: #{item.ctime}
+								when 1
+									div Last move: #{item.mtime}
+									if item.time_left <= 0
+										div Time left: none.
+									else if item.time_left <= 2
+										div Time left: #{ item.time_left * 24 | 0 } hours
+									else if item.time_left <= 5
+										div Time left: #{ item.time_left | 0 } days
+								when 2
+									div Finished: #{item.mtime}
+									div Result: !{item.result}
+								when 3
+									div Finished: #{item.mtime}
+									div Result: !{item.result}
+						unless hide_title
+							a(href=`/${item.title_id}`)
+								img(src=`/${item.title_id}/thumbnail.jpg`)

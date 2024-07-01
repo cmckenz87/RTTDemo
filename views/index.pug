@@ -1,0 +1,47 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		+social(SITE_NAME, "Play historic board games on the web.")
+		meta(name="keywords" content="wargames, war games, block games")
+		title= SITE_NAME
+		style.
+			div.list {
+				margin: 24px 0;
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+				gap: 24px 12px;
+			}
+			div.i {
+				height: 200px;
+				text-align: center;
+				margin-bottom: 6px;
+			}
+			div.t {
+				text-align: center;
+			}
+			div.i img {
+				box-shadow: var(--drop-shadow);
+				border: var(--thin-border);
+			}
+	body
+		include header
+		article.wide
+			h1= SITE_NAME
+
+			div.list
+				each title in TITLE_LIST
+					unless title.is_hidden
+						div.item
+							div.i
+								+gamecover(title.title_id)
+							div.t
+								a.black(href="/"+title.title_id)= title.title_name
+
+			p!= process.env.SITE_INVITE
+
+			if !ENABLE_MAIL
+				p.error Mail notifications disabled.
+			if !ENABLE_WEBHOOKS
+				p.error Webhook notifications disabled.

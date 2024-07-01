@@ -1,0 +1,41 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		title Inbox
+		style.
+			.unread { font-weight: bold }
+			td a { display: block }
+			@media (max-width: 400px) {
+			td:nth-child(3) { display: none }
+			th:nth-child(3) { display: none }
+			}
+	body
+		include header
+		article
+			h1 Inbox
+
+			p
+				a(href="/message/send") Send message
+
+			table.wide.striped
+				thead
+					tr
+						th From
+						th Subject
+						th Date
+				tbody
+					each row in messages
+						- let subject = row.subject
+						- if (subject.length > 50) subject = subject.substring(0,40) + "..."
+						tr(class=row.is_read?"read":"unread")
+							td: a.black(href="/user/"+row.from_name)= row.from_name
+							td: a.black(href="/message/read/"+row.message_id)= subject
+							td.w= row.time
+					else
+						tr
+							td(colspan=3) No messages.
+
+			p
+				a(href="/outbox") Outbox

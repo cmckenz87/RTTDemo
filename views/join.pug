@@ -1,0 +1,116 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		+social(game.title_name,
+			"Play " + game.title_name + " with " + players.map(x=>x.name).join(" and ") + ".",
+			game.title_id)
+		title ##{game.game_id} - #{game.title_name}
+		style.
+			th,td { border: var(--table-border); }
+			a.red { text-decoration: none; color: var(--color-red); font-size: 15px; float: right; }
+			a.green { text-decoration: none; color: var(--color-green); font-size: 15px; float: right; }
+			td, th { border: var(--thin-border); }
+			td { width: 180px; }
+			.hide { display: none; }
+			td.is_invite { background-color: var(--color-table-invite); }
+			td.is_active { background-color: var(--color-table-active); }
+			td.enemy { background-color: var(--color-table-danger); }
+			td.enemy::before { content: "\1f6ab    "; font-size: 15px; }
+		script.
+			let game = !{ JSON.stringify(game) }
+			let roles = !{ JSON.stringify(roles) }
+			let players = !{ JSON.stringify(players) }
+			let user_id = !{ user ? user.user_id : 0 }
+			let whitelist = !{ JSON.stringify(whitelist) }
+			let blacklist = !{ JSON.stringify(blacklist) }
+			let friends = !{ JSON.stringify(friends) }
+			let limit = !{ !!limit }
+			let ready = !{ ready }
+		script(src="/join.js")
+	body
+		include header
+		article
+			if game.scenario === "Standard"
+				h1 ##{game.game_id} - #{game.title_name}
+			else
+				h1 ##{game.game_id} - #{game.title_name} - #{game.scenario}
+
+			div.logo
+				+gamecover(game.title_id)
+
+			if limit && game.status < 1
+				p.error= limit
+			if !user
+				p.error You are not logged in!
+			p.error#error
+
+			if game.owner_id
+				if game.is_private
+					p Created #{game.ctime} by <a class="black" href="/user/#{game.owner_name}">#{game.owner_name}</a> (private).
+				else
+					p Created #{game.ctime} by <a class="black" href="/user/#{game.owner_name}">#{game.owner_name}</a>.
+			else
+				p Created #{game.ctime}.
+
+			if game.status > 1
+				p Finished #{game.mtime}.
+			else if game.status > 0
+				p Last move #{game.mtime}.
+
+			unless game.human_options === "None"
+				p Options: #{game.human_options}.
+
+			case game.pace
+				when 1
+					p #{EMOJI_LIVE} Live!
+				when 2
+					p #{EMOJI_FAST} Fast &ndash; many moves per day.
+				when 3
+					p #{EMOJI_SLOW} Slow &ndash; one move per day.
+
+			if game.notice
+				p
+					i= game.notice
+
+			if user
+				dialog(id="invite")
+					| Invite a friend:
+					br
+					input(id="invite_user" type="text" list="friends" onchange="send_invite()")
+					datalist(id="friends")
+						if friends
+							each who in friends
+								option= who
+					br
+					button(onclick="send_invite()") Invite
+					button(onclick="hide_invite()") Cancel
+
+			p
+			table
+				tbody
+					each role in roles
+						tr
+							th.w(id="role_"+role.replace(/ /g, "_")+"_name")= role
+							td(id="role_"+role.replace(/ /g, "_")) -
+				tfoot
+					tr
+						td#message(colspan=2) -
+
+			p
+				button.hide#delete_button(onclick="confirm_delete()") Delete
+				button.hide#start_button(onclick="start()" disabled) Start
+
+			if !user && !ready
+				p <a href="/login">Login</a> or <a href="/signup">sign up</a> to play.
+
+			if user && user.user_id === 1
+				hr
+				div: p
+					each snap in rewind
+						<a href="/admin/rewind/#{game.game_id}/#{snap.snap_id}">REWIND #{snap.snap_id}</a> - #{snap.state} - #{snap.active}
+						br
+					if DEBUG
+						<a href="/admin/clone/#{game.game_id}">CLONE</a>
+						br

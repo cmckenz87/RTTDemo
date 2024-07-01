@@ -1,0 +1,56 @@
+//- vim:ts=4:sw=4:
+doctype html
+html
+	head
+		include head
+		title Forum
+		meta(http-equiv="refresh" content=3600)
+		style.
+			.unread { font-weight: bold }
+			tbody a { display: block }
+			@media (max-width: 400px) {
+			td:nth-child(2) { display: none }
+			th:nth-child(2) { display: none }
+			}
+
+	body
+		include header
+		article
+			h1 Forum
+
+			table.wide.striped
+				thead
+					tr
+						th Subject
+						th
+						th
+				tbody
+					each row in threads
+						tr(class=row.is_read?"read":"unread")
+							td
+								a.black(href="/forum/thread/"+row.thread_id)= row.subject
+							td.r= row.count
+							td.w= row.mtime
+				tfoot
+					tr
+						td(colspan=4)
+							if current_page > 1
+								| #[a.black(href="/forum/page/"+(current_page-1)) &#x2190;]
+								|
+							- for (let p=1; p<=page_count && p<=30; ++p)
+								if p === current_page
+									| (#{p})
+									|
+								else
+									| #[a.black(href="/forum/page/"+p)= p]
+									|
+							if current_page < page_count
+								| #[a.black(href="/forum/page/"+(current_page+1)) &#x2192;]
+
+			if user
+				p
+					form(method="get" action="/forum/search")
+						input(type="text" name="q" size=40 maxlength=80 placeholder="Search..." required)
+			if user
+				p
+					a(href="/forum/post") New thread

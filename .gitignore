@@ -1,0 +1,17 @@
+# Source assets and working files
+WIP*
+HIRES
+vassal
+tmp
+*.ppm
+
+# Live database files
+.env
+db
+db-shm
+db-wal
+
+# Development clutter
+node_modules
+package-lock.json
+tags
